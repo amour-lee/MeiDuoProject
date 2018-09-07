@@ -19,10 +19,14 @@ import sys
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # 打印导包路径
-print(sys.path)
+# print(sys.path)
+
+# 为了保证应用的注册和导包正常，需要追加导包路径执行'apps'
+sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
+# sys.path(0, os.path.join(BASE_DIR, 'apps'))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'n7wk_8a-=&!&(9^o_4!!@50gn3i=4=f7_fyhq95luau%d!oysq'
 
@@ -42,6 +46,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',  # DRF
+
+    # 用户模块
+    'users.apps.UsersConfig'
 ]
 
 MIDDLEWARE = [
