@@ -192,3 +192,8 @@ REST_FRAMEWORK = {
     # 异常处理
     'EXCEPTION_HANDLER': 'meiduo_mall.utils.exceptions.exception_handler',
 }
+
+
+# 指定默认的用户模型类
+# 注意点：语法规则必须是'应用名.用户模型类'
+AUTH_USER_MODEL = 'users.User'
