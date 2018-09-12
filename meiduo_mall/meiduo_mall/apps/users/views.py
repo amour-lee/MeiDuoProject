@@ -2,7 +2,17 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from .models import User
 from rest_framework.response import Response
+from rest_framework.generics import CreateAPIView
+from rest_framework.serializers import Serializer
 # Create your views here.
+
+
+class UserView(CreateAPIView):
+    """用户注册"""
+
+    # 指定序列化器
+    serializer_class = '注册的序列化器'
+
 
 class MobileCountView(APIView):
     """判断手机号是否重复"""
