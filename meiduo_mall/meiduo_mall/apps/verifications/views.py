@@ -6,7 +6,7 @@ from . import constants
 from meiduo_mall.libs.yuntongxun.sms import CCP
 from rest_framework.response import Response
 from rest_framework import status
-
+from celery_tasks.sms.tasks import send_sms_code
 # Create your views here.
 
 
@@ -49,5 +49,7 @@ class SMSCodeView(APIView):
         # 使用容联云通讯发送短信验证码
         # CCP().send_template_sms(mobile, [sms_code, constants.SMS_CODE_REDIS_EXPIRES // 60], 1)
 
+        #使用异步任务发送短信验证码,调用delay(),触发celery异步任务
+        send_sms_code.delay(mobile, sms_code)
         # 响应结果
         return Response({'message': 'OK'})
