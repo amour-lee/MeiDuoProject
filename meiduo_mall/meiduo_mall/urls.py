@@ -21,4 +21,6 @@ urlpatterns = [
 
     # 验证模块
     url(r'^', include('verifications.urls')),
+    # 用户模块
+    url(r'^', include('users.urls')),
 ]
