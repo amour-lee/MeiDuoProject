@@ -1,0 +1,1 @@
+# celery 启动的入口：# 创建celery对象，# 加载celery配置,注册celery任务
