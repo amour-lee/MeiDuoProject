@@ -24,7 +24,7 @@ class SMSCodeView(APIView):
         logger.info(sms_code)
 
         # 保存短信验证码码到redis
-        redis_conn = get_redis_connection('verify_code')
+        redis_conn = get_redis_connection('verify_codes')
         # redis_conn.setex('key','过期时间','value')
         redis_conn.setex('sms_%s' % mobile, constants.SMS_CODE_REDIS_EXPIRES, sms_code)
         # 使用容联云通讯发送短信验证码
