@@ -14,8 +14,11 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 
 import os
 import sys
+import datetime
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # 打印导包路径
@@ -208,8 +211,20 @@ LOGGING = {
 REST_FRAMEWORK = {
     # 异常处理
     'EXCEPTION_HANDLER': 'meiduo_mall.utils.exceptions.exception_handler',
+
+    # 认证(读取用户身份信息，判断当前的登录用户是否是本网站的用户)
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',   # JWT认证，在前面的认证方案优先
+        'rest_framework.authentication.SessionAuthentication',   # session认证机制
+        'rest_framework.authentication.BasicAuthentication',    # 基础认证
+    ),
 }
 
+# JWT配置
+JWT_AUTH = {
+    # 配置状态保持的有效期
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),
+}
 
 # 指定默认的用户模型类
 # 注意点：语法规则必须是'应用名.用户模型类'

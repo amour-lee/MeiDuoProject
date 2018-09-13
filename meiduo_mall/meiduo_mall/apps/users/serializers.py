@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django_redis import get_redis_connection
 import re
+from rest_framework_jwt.settings import api_settings
 from .models import User
 
 
@@ -10,7 +11,7 @@ class CreateUserSerialzier(serializers.ModelSerializer):
     password2 = serializers.CharField(label='确认密码', write_only=True)
     sms_code = serializers.CharField(label='短信验证码', write_only=True)
     allow = serializers.CharField(label='同意协议', write_only=True)
-
+    token = serializers.CharField(label='登录状态保持', read_only=True)
     class Meta:
         model = User
         # 所有字段：'id', 'username', 'mobile', 'password', 'password2', 'sms_code', 'allow'
@@ -18,7 +19,7 @@ class CreateUserSerialzier(serializers.ModelSerializer):
         # 模型以外字段：'password2', 'sms_code', 'allow'
         # 输入字段(write_only): 'username', 'mobile', 'password', 'password2', 'sms_code', 'allow'
         # 输出字段(read_only): 'id', 'username', 'mobile'
-        fields = ['id', 'username', 'mobile', 'password', 'password2', 'sms_code', 'allow']
+        fields = ['id', 'username', 'mobile', 'password', 'password2', 'sms_code', 'allow', 'token']
 
         # 给username、password指定额外参数
         extra_kwargs = {
@@ -91,5 +92,17 @@ class CreateUserSerialzier(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
 
-        # 响应数据
+        # 必须在注册或者登录之后，响应注册或者登录结果之前，生成jwt_token
+        jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+        jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+        # 生成载荷：包含了user_id,username,email
+        payload = jwt_payload_handler(user)
+        # jwt_token
+        token = jwt_encode_handler(payload)
+
+        # 将token添加到user : python是面向对象的高级动态编程语言
+        user.token = token
+
+        # 响应数据:只会响应read_only字段,
+        # 输出字段(read_only)：'id', 'username', 'mobile', 'token'
         return user
