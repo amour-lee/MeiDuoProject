@@ -52,7 +52,8 @@ INSTALLED_APPS = [
     'corsheaders',    # 解决JS跨域请求问题
 
     'users.apps.UsersConfig',  # 用户模块 由用户模型类限制的此种注册方式
-    'verifications.apps.VerificationsConfig'  # 验证模块
+    'verifications.apps.VerificationsConfig',  # 验证模块
+    'oauth.apps.OauthConfig',  # QQ登录模块
 ]
 
 MIDDLEWARE = [
