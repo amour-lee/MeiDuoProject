@@ -224,6 +224,9 @@ REST_FRAMEWORK = {
 JWT_AUTH = {
     # 配置状态保持的有效期
     'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),
+
+    # 为JWT登录视图补充返回值
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'users.utils.jwt_response_payload_handler',
 }
 
 # 指定默认的用户模型类
