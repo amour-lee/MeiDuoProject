@@ -8,6 +8,7 @@ from rest_framework import status
 import logging
 from .models import OAuthQQUser
 from .utils import generate_save_user_token
+from rest_framework.generics import GenericAPIView
 # Create your views here.
 
 
@@ -15,8 +16,11 @@ from .utils import generate_save_user_token
 logger = logging.getLogger('django')
 
 # url(r'^qq/user/$', views.QQAuthUserView.as_view()),
-class QQAuthUserView(APIView):
+class QQAuthUserView(GenericAPIView):
     """处理QQ扫码登录的回调：完成oauth2.0认证过程"""
+
+    # 指定序列化器
+    serializer_class = '序列化器'
 
     def get(self, request):
         # 提取code请求参数
@@ -66,6 +70,9 @@ class QQAuthUserView(APIView):
                 'token': token
             })
 
+    def post(self):
+        """绑定openid到美多商城"""
+        pass
 
 
 # url(r'^qq/authorization/$', views.QQAuthURLView.as_view()),
