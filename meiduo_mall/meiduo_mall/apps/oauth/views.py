@@ -5,6 +5,7 @@ from django.conf import settings
 from rest_framework.response import Response
 from rest_framework import status
 import logging
+from .models import OAuthQQUser
 # Create your views here.
 
 
@@ -30,17 +31,21 @@ class QQAuthUserView(APIView):
             access_token = oauth.get_access_token(code)
 
             # 使用access_token向QQ服务器请求openid
-            openid = oauth.get_open_id(access_token)
+            open_id = oauth.get_open_id(access_token)
 
         except Exception as e:
             logger.info(e)
             return Response({'message': 'QQ服务器内部错误'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
         # 使用openid查询该QQ用户是否在美多商城中绑定过用户
-
-        # 如果openid已绑定美多商城用户，直接生成JWT token，并返回
-        # 如果openid没绑定美多商城用户，创建用户并绑定到openid
-        pass
+        try:
+            oauthqquser_model = OAuthQQUser.objects.get(openid=open_id)
+        except OAuthQQ.DoesNotExist:
+            # 如果openid没绑定美多商城用户，创建用户并绑定到openid
+            pass
+        else:
+            # 如果openid已绑定美多商城用户，直接生成JWT token，并返回
+            pass
 
 
 
