@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework import status
 import logging
 from .models import OAuthQQUser
+from .utils import generate_save_user_token
 # Create your views here.
 
 
@@ -41,9 +42,13 @@ class QQAuthUserView(APIView):
         # 使用openid查询该QQ用户是否在美多商城中绑定过用户
         try:
             oauthqquser_model = OAuthQQUser.objects.get(openid=open_id)
-        except OAuthQQ.DoesNotExist:
+        except OAuthQQUser.DoesNotExist:
             # 如果openid没绑定美多商城用户，创建用户并绑定到openid
-            pass
+            # 为了方便后续使用openid去绑定美多商城用户，现在需要将openid响应给用户
+            # return Response({'openid':open_id}) # 不能将openid以明文的形式发送出去，需要混淆，让外界不知道原始数据
+            openid_access_token = generate_save_user_token(open_id)
+            return Response({'access_token': openid_access_token})
+
         else:
             # 如果openid已绑定美多商城用户，直接生成JWT token，并返回，user_id,username,token
             jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
