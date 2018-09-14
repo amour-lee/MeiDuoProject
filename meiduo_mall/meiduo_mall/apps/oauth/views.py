@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from rest_framework.settings import api_settings
 from rest_framework.views import APIView
 from QQLoginTool.QQtool import OAuthQQ
 from django.conf import settings
@@ -44,8 +45,21 @@ class QQAuthUserView(APIView):
             # 如果openid没绑定美多商城用户，创建用户并绑定到openid
             pass
         else:
-            # 如果openid已绑定美多商城用户，直接生成JWT token，并返回
-            pass
+            # 如果openid已绑定美多商城用户，直接生成JWT token，并返回，user_id,username,token
+            jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+            jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+
+            # 获取oauth_user关联的user
+            # user = models.ForeignKey('users.User', on_delete=models.CASCADE, verbose_name='用户')
+            user = oauthqquser_model.user
+            payload = jwt_payload_handler(user)
+            token = jwt_encode_handler(payload)
+
+            return Response({
+                'user_id': user.id,
+                'username': user.username,
+                'token': token
+            })
 
 
 
