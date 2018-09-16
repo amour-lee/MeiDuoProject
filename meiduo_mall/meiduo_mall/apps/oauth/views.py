@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework.settings import api_settings
+from rest_framework_jwt.settings import api_settings
 from rest_framework.views import APIView
 from QQLoginTool.QQtool import OAuthQQ
 from django.conf import settings
@@ -9,6 +9,7 @@ import logging
 from .models import OAuthQQUser
 from .utils import generate_save_user_token
 from rest_framework.generics import GenericAPIView
+from .serializers import QQAuthUserSerializer
 # Create your views here.
 
 
@@ -20,7 +21,7 @@ class QQAuthUserView(GenericAPIView):
     """处理QQ扫码登录的回调：完成oauth2.0认证过程"""
 
     # 指定序列化器
-    serializer_class = '序列化器'
+    serializer_class = QQAuthUserSerializer
 
     def get(self, request):
         # 提取code请求参数
@@ -70,11 +71,30 @@ class QQAuthUserView(GenericAPIView):
                 'token': token
             })
 
-    def post(self):
+    def post(self, request):
         """绑定openid到美多商城"""
-        pass
 
+        # 初始化序列化器对象
+        serializer = self.get_serializer(data=request.data)
 
+        # 调用校验的方法
+        serializer.is_valid(raise_exception=True)
+
+        # 调用save()保存数据
+        user = serializer.save()
+
+        # 生成JWT token，并响应
+        jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+        jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+        payload = jwt_payload_handler(user)
+        token = jwt_encode_handler(payload)
+
+        # 保存结束，表示QQ登录成功，需要生成JWT token,并返回token,user_id,username，做状态保持
+        return Response({
+            'token': token,
+            'user_id': user.id,
+            'username': user.username,
+        })
 # url(r'^qq/authorization/$', views.QQAuthURLView.as_view()),
 class QQAuthURLView(APIView):
     """返回QQ扫码登录连接"""
